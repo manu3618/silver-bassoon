@@ -3,6 +3,7 @@ article storage and retrieval
 """
 import os.path
 import uuid
+import warnings
 from datetime import datetime
 
 import dateutil.parser
@@ -10,8 +11,10 @@ import dateutil.parser
 import tinydb
 from collection import Counter
 
+from .rss import feed
 
-class article:
+
+class Article:
     """article representation
     """
 
@@ -58,7 +61,7 @@ class article:
         return bag
 
 
-class corpus:
+class Corpus:
     """
     article corpus
     """
@@ -68,8 +71,15 @@ class corpus:
         if filename is None:
             filename = os.path.join(*["/var", "tmp", db_name])
         self.db = tinydb.TinyDB(filename)
+        self.articles = []
 
     def add_article(self, article):
         """insert article into db
         """
+        ids = [elt.id for elt in self.articles]
+        if article.id in ids:
+            warnings.warn("article %s already in corpus" % article.id)
+            return
+
+        self.articles.append(article)
         self.db.insert(article.to_dict())

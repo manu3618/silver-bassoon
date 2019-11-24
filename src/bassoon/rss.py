@@ -28,7 +28,14 @@ class Feed:
         """
         soup = BeautifulSoup(self.content, features="html.parser")
         self.title = soup.title.text
-        self.articles = list(self._articles())
+
+    @property
+    def articles(self):
+        return list(self._articles())
+
+    def article_iterator(self):
+        """iterator over articles."""
+        return self._articles()
 
     def _articles(self):
         """Return articles from feed content.
