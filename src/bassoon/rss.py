@@ -28,7 +28,7 @@ class Feed:
         """
         soup = BeautifulSoup(self.content)
         self.title = soup.title.text
-        self.articles = list(self._articles)
+        self.articles = list(self._articles())
 
     def _articles(self):
         """Return articles from feed content.
