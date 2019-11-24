@@ -83,3 +83,12 @@ class Corpus:
 
         self.articles.append(article)
         self.db.insert(article.to_dict())
+
+    def from_feed(self, url):
+        """Add article from feed
+        """
+        rss_feed = feed.Feed(url)
+        rss_feed.analyze()
+        for art in rss_feed.article_iterator():
+            article = Article(art)
+            self.add_article(article)
