@@ -17,11 +17,18 @@ class article:
 
     def __init__(self, *args, **kwargs):
         self.id = kwargs.get("id", uuid.uuid1())
+        self.title = kwargs.get("title", "")
+        self.link = kwargs.get("link", "")
         try:
-            self.date = dateutil.parser(kwargs["date"])
+            self.published = dateutil.parser(kwargs["publihed"])
         except KeyError:
-            self.date = datetime.now()
+            self.published = datetime.now()
+        try:
+            self.updated = dateutil.parser(kwargs["publihed"])
+        except KeyError:
+            self.updated = self.pulished
         self.author = kwargs.get("author", "")
+        self.summary = kwargs.get("summary", "")
         self.content = kwargs.get("content", "")
 
     def to_dict(self):
