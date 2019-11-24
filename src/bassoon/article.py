@@ -6,8 +6,8 @@ import uuid
 from datetime import datetime
 
 import dateutil.parser
-import tinydb
 
+import tinydb
 from collection import Counter
 
 

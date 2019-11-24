@@ -26,13 +26,13 @@ class Feed:
     def analyze(self):
         """analyze feed
         """
-        soup = BeautifulSoup(self.content)
+        soup = BeautifulSoup(self.content, features="html.parser")
         self.title = soup.title.text
         self.articles = list(self._articles())
 
     def _articles(self):
         """Return articles from feed content.
         """
-        soup = BeautifulSoup(self.content)
+        soup = BeautifulSoup(self.content, features="html.parser")
         for article in soup.find_all("entry"):
             yield {elt.name: elt.content for elt in article.children}
