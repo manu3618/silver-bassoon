@@ -5,6 +5,7 @@ import os.path
 import uuid
 import warnings
 from datetime import datetime
+from fractions import Fraction
 
 import dateutil.parser
 
@@ -59,6 +60,13 @@ class Article:
             except KeyError:
                 pass
         return bag
+
+    def term_frequency(self, stop_words=None):
+        """Normalized version of BoW.
+       """
+        terms = self.bow(stop_words)
+        wordcount = sum(terms.values())
+        return {word: Fraction(count / wordcount) for word, count in terms.items()}
 
 
 class Corpus:
