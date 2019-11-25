@@ -4,15 +4,16 @@ article storage and retrieval
 import os.path
 import uuid
 import warnings
+from collections import Counter
 from datetime import datetime
 from fractions import Fraction
 
 import dateutil.parser
+import pandas as pd
 
 import tinydb
-from collection import Counter
 
-from .rss import feed
+from .rss import Feed
 
 
 class Article:
@@ -20,23 +21,28 @@ class Article:
     """
 
     def __init__(self, *args, **kwargs):
-        self.id = kwargs.get("id", uuid.uuid1())
+        self.id = kwargs.get("id", str(uuid.uuid1()))
         self.title = kwargs.get("title", "")
         self.link = kwargs.get("link", "")
         try:
-            self.published = dateutil.parser(kwargs["publihed"])
+            self.published = dateutil.parser.parse(kwargs["published"])
         except KeyError:
             self.published = datetime.now()
         try:
-            self.updated = dateutil.parser(kwargs["publihed"])
+            self.updated = dateutil.parser.parse(kwargs["updated"])
         except KeyError:
-            self.updated = self.pulished
+            self.updated = self.published
         self.author = kwargs.get("author", "")
         self.summary = kwargs.get("summary", "")
         self.content = kwargs.get("content", "")
 
     def to_dict(self):
-        return vars(self)
+        """Return JSON serializable document.
+        """
+        doc = vars(self)
+        for key in "published", "updated":
+            doc[key] = doc[key].isoformat()
+        return doc
 
     def bow(self, stop_words=None):
         """Bag of word representation.
@@ -49,7 +55,7 @@ class Article:
         if stop_words is None:
             stop_words = []
 
-        content = self.content.lowercase()
+        content = self.content.lower()
         for char in ",.:!?":
             content.replace(char, " ")
 
@@ -78,7 +84,9 @@ class Corpus:
         self.db_name = db_name
         if filename is None:
             filename = os.path.join(*["/var", "tmp", db_name])
+        self.db_filename = filename
         self.db = tinydb.TinyDB(filename)
+        self.stop_words = []
         self.articles = []
 
     def add_article(self, article):
@@ -95,8 +103,16 @@ class Corpus:
     def from_feed(self, url):
         """Add article from feed
         """
-        rss_feed = feed.Feed(url)
+        rss_feed = Feed(url)
         rss_feed.analyze()
         for art in rss_feed.article_iterator():
             article = Article(art)
             self.add_article(article)
+
+    def document_term_matrix(self):
+        """Return document term matrix.
+        """
+        tm = pd.DataFrame(
+            {doc.id: doc.term_frequency(self.stop_words) for doc in self.articles}
+        )
+        return tm.filna(0)
