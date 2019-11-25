@@ -57,7 +57,7 @@ class Article:
 
         content = self.content.lower()
         for char in ",.:!?":
-            content.replace(char, " ")
+            content = content.replace(char, " ")
 
         bag = Counter(content.split())
         for key in stop_words:
@@ -115,4 +115,21 @@ class Corpus:
         tm = pd.DataFrame(
             {doc.id: doc.term_frequency(self.stop_words) for doc in self.articles}
         )
-        return tm.filna(0)
+        return tm.fillna(0)
+
+    def term_document_matrix(self):
+        """Return documen term matrix.
+        """
+        return self.document_term_matrix().transpose()
+
+    def document_by_document(self):
+        """Return document by document matrix.
+        """
+        dt = self.document_term_matrix()
+        return dt.dot(dt.transpose())
+
+    def term_by_term(self):
+        """Return term by term matrix.
+        """
+        td = self.term_document_matrix()
+        return td.dot(td.transpose())
