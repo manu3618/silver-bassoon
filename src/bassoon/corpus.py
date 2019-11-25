@@ -80,12 +80,14 @@ class Corpus:
     article corpus
     """
 
-    def __init__(self, db_name="collection", filename=None):
+    def __init__(self, db_name="collection", filename=None, use_db=True):
         self.db_name = db_name
         if filename is None:
             filename = os.path.join(*["/var", "tmp", db_name])
         self.db_filename = filename
-        self.db = tinydb.TinyDB(filename)
+        self.use_db = use_db
+        if self.use_db:
+            self.db = tinydb.TinyDB(filename)
         self.stop_words = []
         self.articles = []
 
@@ -97,8 +99,10 @@ class Corpus:
             warnings.warn("article %s already in corpus" % article.id)
             return
 
+        if self.use_db:
+            self.db.insert(article.to_dict())
+
         self.articles.append(article)
-        self.db.insert(article.to_dict())
 
     def from_feed(self, url):
         """Add article from feed

@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from faker import Faker
 
-from bassoon.article import Article, Corpus
+from bassoon.corpus import Article, Corpus
 
 
 def article_iterator(nb_article=10):
@@ -37,7 +37,7 @@ def article_iterator(nb_article=10):
 @pytest.fixture
 def corpus():
     # set up
-    docs = Corpus()
+    docs = Corpus(use_db=False)
     articles = article_iterator()
     for article in articles:
         docs.add_article(article)
@@ -45,7 +45,8 @@ def corpus():
     yield docs
 
     # tear down
-    os.remove(docs.db_filename)
+    if docs.use_db:
+        os.remove(docs.db_filename)
 
 
 def test_ddmatrix(corpus):
