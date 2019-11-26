@@ -116,15 +116,15 @@ class Corpus:
     def document_term_matrix(self):
         """Return document term matrix.
         """
-        tm = pd.DataFrame(
-            {doc.id: doc.term_frequency(self.stop_words) for doc in self.articles}
-        )
-        return tm.fillna(0)
+        return self.term_documet_matrix().transpose()
 
     def term_document_matrix(self):
         """Return documen term matrix.
         """
-        return self.document_term_matrix().transpose()
+        tm = pd.DataFrame(
+            {doc.id: doc.term_frequency(self.stop_words) for doc in self.articles}
+        )
+        return tm.fillna(0)
 
     def document_by_document(self):
         """Return document by document matrix.
