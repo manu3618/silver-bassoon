@@ -6,9 +6,9 @@ import uuid
 import warnings
 from collections import Counter
 from datetime import datetime
-from fractions import Fraction
 
 import dateutil.parser
+import numpy as np
 import pandas as pd
 
 import tinydb
@@ -69,10 +69,17 @@ class Article:
 
     def term_frequency(self, stop_words=None):
         """Normalized version of BoW.
-       """
+        """
+        return self.normalize_bow(stop_words, 1)
+
+    def normalize_bow(self, stop_words=None, norm=2):
+        """normalized version of bow, with norm choice.
+        """
         terms = self.bow(stop_words)
-        wordcount = sum(terms.values())
-        return {word: Fraction(count / wordcount) for word, count in terms.items()}
+
+        # values are greater than zero, no abs needed
+        size = np.power(sum(np.power(list(terms.values()), norm)), 1 / norm)
+        return {word: count / size for word, count in terms.items()}
 
 
 class Corpus:
