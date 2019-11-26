@@ -68,6 +68,7 @@ def test_stopwords(corpus):
     """Check stop words are detected.
     """
     corpus.articles[0].content += " an "
+    corpus.articles[-1].content += " reallyimprobableword "
     for art in corpus.articles:
         art.content += " cornichon"
 
@@ -78,3 +79,6 @@ def test_stopwords(corpus):
 
     # short word
     assert "an" in words
+
+    # not signifficant
+    assert "reallyimprobableword" in words
