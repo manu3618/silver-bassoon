@@ -153,10 +153,11 @@ class Corpus:
         """
         td = self.term_document_matrix()
         for term, row in td.iterrows():
-            if all(row != 0):
-                # word present in all article, not usefull
-                self.stop_words.add(term)
-            if len(term) < 3:
+            if any(
+                row != 0,  # word present in all article, not usefull
+                len(term) < 3,
+                len(row[row > 0] < 2),  # present in too few article to be usefull
+            ):
                 self.stop_words.add(term)
         return self.stop_words
 
