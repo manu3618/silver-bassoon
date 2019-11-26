@@ -88,7 +88,7 @@ class Corpus:
         self.use_db = use_db
         if self.use_db:
             self.db = tinydb.TinyDB(filename)
-        self.stop_words = []
+        self.stop_words = set()
         self.articles = []
 
     def add_article(self, article):
@@ -116,7 +116,7 @@ class Corpus:
     def document_term_matrix(self):
         """Return document term matrix.
         """
-        return self.term_documet_matrix().transpose()
+        return self.term_document_matrix().transpose()
 
     def term_document_matrix(self):
         """Return documen term matrix.
@@ -137,3 +137,18 @@ class Corpus:
         """
         td = self.term_document_matrix()
         return td.dot(td.transpose())
+
+    def autodetect_stopwords(self):
+        """Return possible stopwords in corpus.
+
+        Returns:
+            (set) stopwords
+        """
+        td = self.term_document_matrix()
+        for term, row in td.iterrows():
+            if all(row != 0):
+                # word present in all article, not usefull
+                self.stop_words.add(term)
+            if len(term) < 3:
+                self.stop_words.add(term)
+        return self.stop_words

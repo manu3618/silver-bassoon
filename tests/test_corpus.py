@@ -62,3 +62,19 @@ def test_ddmatrix(corpus):
             np.isclose([np.min(np.linalg.eigvals(mat))], [0]),
         ]
     )
+
+
+def test_stopwords(corpus):
+    """Check stop words are detected.
+    """
+    corpus.articles[0].content += " an "
+    for art in corpus.articles:
+        art.content += " cornichon"
+
+    words = corpus.autodetect_stopwords()
+
+    # non specific word
+    assert "cornichon" in words
+
+    # short word
+    assert "an" in words
