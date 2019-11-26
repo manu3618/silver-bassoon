@@ -159,3 +159,19 @@ class Corpus:
             if len(term) < 3:
                 self.stop_words.add(term)
         return self.stop_words
+
+    def inverse_doc_freq(self, term):
+        """Return term relevance.
+        """
+        td = self.term_document_matrix()
+        row = td.loc[term, :]
+        related_articles = row[row > 0]
+        return np.log(len(self.articles) / len(related_articles))
+
+    def terms_weighting(self, terms=None):
+        """Return terms relevance.
+        """
+        if terms is None:
+            td = self.term_document_matrix()
+            terms = td.index
+        return {term: self.inverse_doc_freq(term) for term in terms}
