@@ -4,9 +4,9 @@ article storage and retrieval
 import os.path
 import uuid
 import warnings
-from collections import Counter
+from collections import Counter, OrderedDict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import dateutil.parser
 import numpy as np
@@ -174,21 +174,33 @@ class Corpus:
                 self.stop_words.add(term)
         return self.stop_words
 
-    def inverse_doc_freq(self, term):
+    def inverse_doc_freq(self, term, articles=None):
         """Return term relevance.
+
+        Args:
+            term (str)
+            articles (list) if None, use self.articles
         """
-        td = self.term_document_matrix()
+        if articles is None:
+            articles = self.articles
+            td = pd.DataFrame(
+                {doc.id: doc.term_frequency(self.stop_words) for doc in articles}
+            )
+        else:
+            td = self.term_document_matrix()
         row = td.loc[term, :]
         related_articles = row[row > 0]
-        return np.log(len(self.articles) / len(related_articles))
+        return np.log(len(articles) / len(related_articles))
 
-    def terms_weighting(self, terms=None):
+    def terms_weighting(self, terms=None, articles=None):
         """Return terms relevance.
         """
         if terms is None:
             td = self.term_document_matrix()
             terms = td.index
-        return {term: self.inverse_doc_freq(term) for term in terms}
+        if articles is None:
+            articles = self.articles
+        return {term: self.inverse_doc_freq(term, articles) for term in terms}
 
     def most_relevant_terms(self, nb_terms=10):
         """Return most relevant terms
@@ -214,3 +226,19 @@ class Corpus:
         partial_td = self.term_document_matrix().loc[terms, :]
         art_ids = partial_td.sum().sort_values(ascending=False).index
         return [self.get_article(artid) for artid in art_ids]
+
+    def date_words(self, date, delta=timedelta(days=10), nb_words=10):
+        """Return relevant words around this date
+        """
+        articles = [
+            art
+            for art in self.articles
+            if any(
+                [
+                    art.published < date + delta and art.published > date - delta,
+                    art.updated < date + delta and art.updated > date - delta,
+                ]
+            )
+        ]
+        term_weights = self.terms_weighting(articles=articles)
+        return OrderedDict(Counter(term_weights).most_common(nb_words))
