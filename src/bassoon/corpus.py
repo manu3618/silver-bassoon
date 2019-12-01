@@ -5,6 +5,7 @@ import os.path
 import uuid
 import warnings
 from collections import Counter
+from dataclasses import dataclass
 from datetime import datetime
 
 import dateutil.parser
@@ -16,9 +17,19 @@ import tinydb
 from .rss import Feed
 
 
+@dataclass(init=False)
 class Article:
     """article representation
     """
+
+    id: str
+    published: datetime
+    updated: datetime
+    title: str
+    link: str
+    author: str
+    summary: str
+    content: str
 
     def __init__(self, *args, **kwargs):
         self.id = kwargs.get("id", str(uuid.uuid1()))
