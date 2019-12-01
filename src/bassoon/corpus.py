@@ -242,3 +242,22 @@ class Corpus:
         ]
         term_weights = self.terms_weighting(articles=articles)
         return OrderedDict(Counter(term_weights).most_common(nb_words))
+
+    def hot_term_matrix(self, start=None, end=None):
+        """Return terms over time.
+        """
+        art_dates = set.union(*[{art.published, art.updated} for art in self.articles])
+        dates_delta = max(art_dates) - min(art_dates)
+        if start is None:
+            start = min(art_dates) - dates_delta / 10
+        if end is None:
+            end = max(art_dates) + dates_delta / 10
+
+        df = pd.DataFrame(
+            {
+                date: self.date_words(date, (end - start) / 10)
+                for date in pd.date_range(start=start, end=end, periods=60)
+            }
+        )
+        df.fillna(0)
+        return df
