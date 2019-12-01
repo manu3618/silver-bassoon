@@ -174,7 +174,7 @@ class Corpus:
                 self.stop_words.add(term)
         return self.stop_words
 
-    def inverse_doc_freq(self, term, articles=None):
+    def inverse_doc_freq(self, term, articles=None, dumb=False):
         """Return term relevance.
 
         Args:
@@ -190,17 +190,21 @@ class Corpus:
             td = self.term_document_matrix()
         row = td.loc[term, :]
         related_articles = row[row > 0]
+        if dumb:
+            return len(related_articles)
         return np.log(len(articles) / len(related_articles))
 
-    def terms_weighting(self, terms=None, articles=None):
+    def terms_weighting(self, terms=None, articles=None, dumb=False):
         """Return terms relevance.
+
+        if false return number of article instead of inverse doc frequency.
         """
         if terms is None:
             td = self.term_document_matrix()
             terms = td.index
         if articles is None:
             articles = self.articles
-        return {term: self.inverse_doc_freq(term, articles) for term in terms}
+        return {term: self.inverse_doc_freq(term, articles, dumb) for term in terms}
 
     def most_relevant_terms(self, nb_terms=10):
         """Return most relevant terms
@@ -227,7 +231,7 @@ class Corpus:
         art_ids = partial_td.sum().sort_values(ascending=False).index
         return [self.get_article(artid) for artid in art_ids]
 
-    def date_words(self, date, delta=timedelta(days=10), nb_words=10):
+    def date_words(self, date, delta=timedelta(days=10), nb_words=10, dumb=False):
         """Return relevant words around this date
         """
         articles = [
@@ -240,10 +244,10 @@ class Corpus:
                 ]
             )
         ]
-        term_weights = self.terms_weighting(articles=articles)
+        term_weights = self.terms_weighting(articles=articles, dumb=dumb)
         return OrderedDict(Counter(term_weights).most_common(nb_words))
 
-    def hot_term_matrix(self, start=None, end=None):
+    def hot_term_matrix(self, start=None, end=None, dumb=False):
         """Return terms over time.
         """
         art_dates = set.union(*[{art.published, art.updated} for art in self.articles])
@@ -255,7 +259,7 @@ class Corpus:
 
         df = pd.DataFrame(
             {
-                date: self.date_words(date, (end - start) / 10)
+                date: self.date_words(date, (end - start) / 10, dumb=dumb)
                 for date in pd.date_range(start=start, end=end, periods=60)
             }
         )
