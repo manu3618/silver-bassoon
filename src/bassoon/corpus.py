@@ -189,3 +189,28 @@ class Corpus:
             td = self.term_document_matrix()
             terms = td.index
         return {term: self.inverse_doc_freq(term) for term in terms}
+
+    def most_relevant_terms(self, nb_terms=10):
+        """Return most relevant terms
+        """
+        return [
+            term for term, _ in Counter(self.terms_weighting()).most_common(nb_terms)
+        ]
+
+    def get_article(self, id):
+        """Get article by id
+        """
+        return next((art for art in self.articles if art.id == id))
+
+    def find_articles(self, terms):
+        """find articles havng those terms.
+
+        Args:
+            terms (list)
+
+        Returns:
+            (list) : ordered list of articles containing at least one term.
+        """
+        partial_td = self.term_document_matrix().loc[terms, :]
+        art_ids = partial_td.sum().sort_values(ascending=False).index
+        return [self.get_article(artid) for artid in art_ids]
