@@ -34,14 +34,22 @@ def article_iterator(nb_article=10):
         yield Article(**art_dict)
 
 
-@pytest.fixture
-def corpus():
-    # set up
-    docs = Corpus(use_db=False)
-    articles = article_iterator()
-    for article in articles:
-        docs.add_article(article)
+def populate_corpus(basson=None, nb_articles=10):
+    """Add article to a corpus.
 
+    If corpus does not exist, create it.
+    """
+    if basson is None:
+        basson = Corpus(use_db=False)
+    articles = article_iterator(nb_articles)
+    for article in articles:
+        basson.add_article(article)
+    return basson
+
+
+@pytest.fixture
+def coprus():
+    docs = populate_corpus()
     yield docs
 
     # tear down
