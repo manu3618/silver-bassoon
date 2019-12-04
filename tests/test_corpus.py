@@ -48,7 +48,7 @@ def populate_corpus(basson=None, nb_articles=10):
 
 
 @pytest.fixture
-def coprus():
+def corpus():
     docs = populate_corpus()
     yield docs
 
