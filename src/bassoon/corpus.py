@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 import numpy as np
 import pandas as pd
+from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 
 import tinydb
 
@@ -64,10 +65,9 @@ class Article:
             stop_words (list): words  to exclude
         """
         if stop_words is None:
-            stop_words = []
+            stop_words = set(ENGLISH_STOP_WORDS)
 
         content = self.content.lower()
-        for char in ",.:!?":
             content = content.replace(char, " ")
 
         bag = Counter(content.split())
