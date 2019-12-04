@@ -7,10 +7,12 @@ import warnings
 from collections import Counter, OrderedDict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from string import punctuation
 
 import dateutil.parser
 import numpy as np
 import pandas as pd
+from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 
 import tinydb
 
@@ -64,10 +66,10 @@ class Article:
             stop_words (list): words  to exclude
         """
         if stop_words is None:
-            stop_words = []
+            stop_words = set(ENGLISH_STOP_WORDS)
 
         content = self.content.lower()
-        for char in ",.:!?":
+        for char in punctuation:
             content = content.replace(char, " ")
 
         bag = Counter(content.split())
