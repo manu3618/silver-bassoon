@@ -7,6 +7,7 @@ import warnings
 from collections import Counter, OrderedDict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from string import punctuation
 
 import dateutil.parser
 import numpy as np
@@ -68,6 +69,7 @@ class Article:
             stop_words = set(ENGLISH_STOP_WORDS)
 
         content = self.content.lower()
+        for char in punctuation:
             content = content.replace(char, " ")
 
         bag = Counter(content.split())
