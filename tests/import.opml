@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<opml version="1.0">
+  <head>
+    <title>Silver bassson test file</title>
+  </head>
+  <body>
+      <outline title="feed list" text="feed list" description="feed list" type="folder" id="jpjiosb" sortColumn="time" sortReversed="false" expanded="true">
+        <outline title="Pythonic Perambulations" text="Pythonic Perambulations" description="Pythonic Perambulations" type="atom" id="ufwkddl" sortColumn="time" xmlUrl="https://jakevdp.github.io/feeds/all.atom.xml" htmlUrl="http://jakevdp.github.io/feeds/all.atom.xml" updateInterval="-1" collapsed="true"/>
+    </outline>
+  </body>
+</opml>

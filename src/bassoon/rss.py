@@ -43,3 +43,21 @@ class Feed:
         soup = BeautifulSoup(self.content, features="html.parser")
         for article in soup.find_all("entry"):
             yield {elt.name: elt.content for elt in article.children}
+
+
+def opml_to_feeds(filename):
+    """Get feeds from OPML file
+
+    Args:
+        filename (str): path to opml file
+    Returns:
+        (list): list of Feed
+    """
+    with open(filename, "r") as fd:
+        soup = BeautifulSoup(fd.read())
+
+    return [
+        Feed(elt.attrs["xmlurl"])
+        for elt in soup.find_all("outline")
+        if "xmlurl" in elt.attrs
+    ]

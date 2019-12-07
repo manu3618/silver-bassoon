@@ -17,3 +17,11 @@ def test_feed_analyze(filename):
 
     feed.analyze()
     assert len(feed.articles) > 0
+
+
+@pytest.mark.parametrize("filename", Path(TEST_DIR).glob("*opml"))
+def test_opml(filename):
+    feeds = rss.opml_to_feeds(filename)
+    for feed in feeds:
+        feed.retrieve()
+        assert len(feed.articles) > 0
