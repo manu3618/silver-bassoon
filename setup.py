@@ -10,5 +10,5 @@ setup(
     author_email="manu+gthub@hbrt.eu",
     url="https://github.com/manu3618/silver-bassoon.git",
     package_dir={"": "src"},
-    packages=["basson"],
+    packages=["bassoon"],
 )
