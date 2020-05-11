@@ -26,5 +26,5 @@ setup(
     url="https://github.com/manu3618/silver-bassoon.git",
     package_dir={"": "src"},
     packages=["bassoon"],
-    requires=get_requirements(REQUIREMENTS_FILENAMES),
+    install_requires=get_requirements(REQUIREMENTS_FILENAMES),
 )
