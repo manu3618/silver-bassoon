@@ -61,6 +61,9 @@ class Period:
             return False
         return True
 
+    def timelen(self):
+        return self.end.date - self.end.date
+
     def __lt__(self, value):
         return self.start < value.start
 
@@ -107,3 +110,7 @@ class Timeline:
         evs.extend([p.end for p in self.periods])
         evs.extend(self.events)
         return min(evs), max(evs)
+
+    def timelen(self):
+        start, end = self.limits()
+        return end.date - start.date
