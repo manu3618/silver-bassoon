@@ -80,6 +80,7 @@ class Timeline:
             self.periods = periods
         else:
             self.periods = []
+        self.events = []
 
     def non_overlapping_periods(self):
         """Separate Periods in list of non overlapping periods
@@ -100,3 +101,9 @@ class Timeline:
                 non_overlapping.append(candidate)
             candidate.append(period)
         return non_overlapping
+
+    def limits(self):
+        evs = [p.start for p in self.periods]
+        evs.extend([p.end for p in self.periods])
+        evs.extend(self.events)
+        return min(evs), max(evs)
