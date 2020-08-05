@@ -3,6 +3,11 @@ Tools to plot a timeline chart
 """
 from datetime import datetime, timedelta
 
+import pandas as pd
+from matplotlib.cm import rainbow
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+
 
 class Event:
     def __init__(self, date=None, label=None):
@@ -105,12 +110,47 @@ class Timeline:
             candidate.append(period)
         return non_overlapping
 
-    def limits(self):
+    def _all_events(self):
         evs = [p.start for p in self.periods]
         evs.extend([p.end for p in self.periods])
         evs.extend(self.events)
+        return evs
+
+    def limits(self):
+        evs = self._all_events()
         return min(evs), max(evs)
 
     def timelen(self):
         start, end = self.limits()
         return end.date - start.date
+
+    def plot(self, cmap=rainbow):
+        """Plot a timeline
+
+        Returns:
+            matplotlib.Axes
+        """
+        line_nb = len(self.non_overlapping_periods())
+        evs = self._all_events()
+        ax = pd.Series({ev.date: line_nb for ev in evs}).plot(alpha=0)
+        corresp = dict(zip(ax.lines[0]._xorig, ax.lines[0]._x))
+
+        for line, periods in enumerate(self.non_overlapping_periods()):
+            for p_nb, period in enumerate(periods):
+                x_lim = corresp[period.start.date], corresp[period.end.date]
+                ax.add_patch(
+                    Rectangle(
+                        (x_lim[0], line),
+                        x_lim[1] - x_lim[0],
+                        1,
+                        facecolor=cmap(line + p_nb),
+                    )
+                )
+                ax.text(x_lim[0] + 0.1, line + 0.1, period.label)
+
+        for event in self.events:
+            xevent = corresp[event.date]
+            ax.add_line(Line2D([xevent, xevent], [0, line_nb],))
+            ax.text(xevent, line_nb + 0.5, event.label, rotation=45)
+
+        return ax
