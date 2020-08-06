@@ -44,7 +44,7 @@ class Period:
         if end_date is None and period is not None:
             end_date = start_date + period
         if end_date < start_date:
-            return ValueError("end must be posterior to start.")
+            raise ValueError("end must be posterior to start.")
         if label is None:
             label = "Period from {} to {}".format(
                 start_date.isoformat(), end_date.isoformat()
