@@ -4,7 +4,7 @@ Tools to plot a timeline chart
 from datetime import datetime, timedelta
 
 import pandas as pd
-from matplotlib.cm import rainbow
+from matplotlib.cm import hsv
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 
@@ -124,7 +124,7 @@ class Timeline:
         start, end = self.limits()
         return end.date - start.date
 
-    def plot(self, cmap=rainbow):
+    def plot(self, cmap=hsv):
         """Plot a timeline
 
         Returns:
@@ -153,4 +153,5 @@ class Timeline:
             ax.add_line(Line2D([xevent, xevent], [0, line_nb],))
             ax.text(xevent, line_nb + 0.5, event.label, rotation=45)
 
+        ax.yaxis.set_visible(False)
         return ax
