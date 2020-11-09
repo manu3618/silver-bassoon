@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import tempfile
+from datetime import datetime
 
 import requests
 from PIL import Image
@@ -34,7 +35,9 @@ class Picture:
 
 
 class PictureGetter:
-    def __init__(self):
+    def __init__(self, logger=None):
+        if self.logger is None:
+            self.logger = logging.getLogger()
         self._pictures = []  # list of Picture
 
     def add_by_url(self, url):
@@ -44,8 +47,22 @@ class PictureGetter:
         im = Picture(url=url)
         self._pictures.append(im)
 
+    def iter_picture(self):
+        for image in self._pictures:
+            yield image.get_image()
 
-def dl_file(url, filename, nb_try=5, wait_time=10, logger=None):
+    def dl_all_pictures(self):
+        nb_images = len(self._pictures)
+        time_marker = datetime.now()
+        for idx, im in enumerate(self._picture):
+            if (datetime.now() - time_marker).seconds > 60:
+                time_marker = datetime.now()
+                msg = "downloading image {} / {} ({})".format(idx, nb_images, im.url)
+                self.logger.info(msg)
+            im.get_image()
+
+
+async def dl_file(url, filename, nb_try=5, wait_time=10, logger=None):
     """Write file from url to filename.
 
     Args:
@@ -69,7 +86,7 @@ def dl_file(url, filename, nb_try=5, wait_time=10, logger=None):
         fd.write(content)
 
 
-def _dl_file(url):
+async def _dl_file(url):
     async with DL_SIMULT_SEM:
         req = requests.get(url)
         if req.status_code != 200 or not req.content:
