@@ -1,6 +1,7 @@
 beautifulsoup4
 matplotlib
 pandas
+Pillow
 requests
 sklearn
 tinydb
