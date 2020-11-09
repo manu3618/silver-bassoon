@@ -12,16 +12,12 @@ DL_SIMULT_SEM = asyncio.Semaphore(3)
 
 
 class Picture:
-    def __init__(
-        self,
-        url=None,
-        filename=None,
-    ):
+    def __init__(self, url=None, filename=None):
         self.url = url
         self.filename = filename
-        self.image = None  # PIL
+        self.image = None
 
-    def get_image(self):
+    async def get_image(self):
         if self.image:
             return self.image
         if self.filename:
@@ -29,14 +25,14 @@ class Picture:
             return self.image
         if self.url:
             self.filename = tempfile.mktemp()
-            dl_file(self.url, self.filename)
-            self.image = Image(self.filename)
+            await dl_file(self.url, self.filename)
+            self.image = Image.open(self.filename)
         return self.image
 
 
 class PictureGetter:
     def __init__(self, logger=None):
-        if self.logger is None:
+        if logger is None:
             self.logger = logging.getLogger()
         self._pictures = []  # list of Picture
 
@@ -47,19 +43,19 @@ class PictureGetter:
         im = Picture(url=url)
         self._pictures.append(im)
 
-    def iter_picture(self):
+    async def iter_picture(self):
         for image in self._pictures:
-            yield image.get_image()
+            yield await image.get_image()
 
-    def dl_all_pictures(self):
+    async def dl_all_pictures(self):
         nb_images = len(self._pictures)
         time_marker = datetime.now()
-        for idx, im in enumerate(self._picture):
+        for idx, im in enumerate(self._pictures):
             if (datetime.now() - time_marker).seconds > 60:
                 time_marker = datetime.now()
                 msg = "downloading image {} / {} ({})".format(idx, nb_images, im.url)
                 self.logger.info(msg)
-            im.get_image()
+            await im.get_image()
 
 
 async def dl_file(url, filename, nb_try=5, wait_time=10, logger=None):
@@ -75,7 +71,7 @@ async def dl_file(url, filename, nb_try=5, wait_time=10, logger=None):
         logger = logging.getLogger()
     for attempt in range(nb_try):
         try:
-            content = _dl_file(url)
+            content = await _dl_file(url)
             break
         except Exception as exn:
             logger.warning(exn)
