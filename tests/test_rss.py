@@ -2,7 +2,6 @@ import os.path
 from pathlib import Path
 
 import pytest
-
 from bassoon import rss
 
 TEST_DIR = os.path.dirname("__file__")

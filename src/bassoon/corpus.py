@@ -12,17 +12,15 @@ from string import punctuation
 import dateutil.parser
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
-
 import tinydb
+from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 
 from .rss import Feed
 
 
 @dataclass(init=False)
 class Article:
-    """article representation
-    """
+    """article representation"""
 
     id: str
     published: datetime
@@ -50,8 +48,7 @@ class Article:
         self.content = kwargs.get("content", "")
 
     def to_dict(self):
-        """Return JSON serializable document.
-        """
+        """Return JSON serializable document."""
         doc = vars(self)
         for key in "published", "updated":
             doc[key] = doc[key].isoformat()
@@ -81,13 +78,11 @@ class Article:
         return bag
 
     def term_frequency(self, stop_words=None):
-        """Normalized version of BoW.
-        """
+        """Normalized version of BoW."""
         return self.normalize_bow(stop_words, 1)
 
     def normalize_bow(self, stop_words=None, norm=2):
-        """normalized version of bow, with norm choice.
-        """
+        """normalized version of bow, with norm choice."""
         terms = self.bow(stop_words)
 
         # values are greater than zero, no abs needed
@@ -112,8 +107,7 @@ class Corpus:
         self.articles = []
 
     def add_article(self, article):
-        """insert article into db
-        """
+        """insert article into db"""
         ids = [elt.id for elt in self.articles]
         if article.id in ids:
             warnings.warn("article %s already in corpus" % article.id)
@@ -125,8 +119,7 @@ class Corpus:
         self.articles.append(article)
 
     def from_feed(self, url):
-        """Add article from feed
-        """
+        """Add article from feed"""
         rss_feed = Feed(url)
         rss_feed.analyze()
         for art in rss_feed.article_iterator():
@@ -134,27 +127,23 @@ class Corpus:
             self.add_article(article)
 
     def document_term_matrix(self):
-        """Return document term matrix.
-        """
+        """Return document term matrix."""
         return self.term_document_matrix().transpose()
 
     def term_document_matrix(self):
-        """Return documen term matrix.
-        """
+        """Return documen term matrix."""
         tm = pd.DataFrame(
             {doc.id: doc.term_frequency(self.stop_words) for doc in self.articles}
         )
         return tm.fillna(0)
 
     def document_by_document(self):
-        """Return document by document matrix.
-        """
+        """Return document by document matrix."""
         dt = self.document_term_matrix()
         return dt.dot(dt.transpose())
 
     def term_by_term(self):
-        """Return term by term matrix.
-        """
+        """Return term by term matrix."""
         td = self.term_document_matrix()
         return td.dot(td.transpose())
 
@@ -209,15 +198,13 @@ class Corpus:
         return {term: self.inverse_doc_freq(term, articles, dumb) for term in terms}
 
     def most_relevant_terms(self, nb_terms=10):
-        """Return most relevant terms
-        """
+        """Return most relevant terms"""
         return [
             term for term, _ in Counter(self.terms_weighting()).most_common(nb_terms)
         ]
 
     def get_article(self, id):
-        """Get article by id
-        """
+        """Get article by id"""
         return next((art for art in self.articles if art.id == id))
 
     def find_articles(self, terms):
@@ -234,8 +221,7 @@ class Corpus:
         return [self.get_article(artid) for artid in art_ids]
 
     def date_words(self, date, delta=timedelta(days=10), nb_words=10, dumb=False):
-        """Return relevant words around this date
-        """
+        """Return relevant words around this date"""
         articles = [
             art
             for art in self.articles
@@ -250,8 +236,7 @@ class Corpus:
         return OrderedDict(Counter(term_weights).most_common(nb_words))
 
     def hot_term_matrix(self, start=None, end=None, dumb=False):
-        """Return terms over time.
-        """
+        """Return terms over time."""
         art_dates = set.union(*[{art.published, art.updated} for art in self.articles])
         dates_delta = max(art_dates) - min(art_dates)
         if start is None:

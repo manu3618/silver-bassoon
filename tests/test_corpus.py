@@ -4,9 +4,8 @@ from datetime import timedelta
 
 import numpy as np
 import pytest
-from faker import Faker
-
 from bassoon.corpus import Article, Corpus
+from faker import Faker
 
 
 def article_iterator(nb_article=10):
@@ -58,8 +57,7 @@ def corpus():
 
 
 def test_ddmatrix(corpus):
-    """Check properties of document by document matrix.
-    """
+    """Check properties of document by document matrix."""
     mat = corpus.document_by_document().applymap(float)
     assert np.all(mat == mat.transpose())
     assert any(
@@ -73,8 +71,7 @@ def test_ddmatrix(corpus):
 
 
 def test_stopwords(corpus):
-    """Check stop words are detected.
-    """
+    """Check stop words are detected."""
     corpus.articles[0].content += " an "
     corpus.articles[-1].content += " reallyimprobableword "
     for art in corpus.articles:

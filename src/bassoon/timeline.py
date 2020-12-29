@@ -150,7 +150,12 @@ class Timeline:
 
         for event in self.events:
             xevent = corresp[event.date]
-            ax.add_line(Line2D([xevent, xevent], [0, line_nb],))
+            ax.add_line(
+                Line2D(
+                    [xevent, xevent],
+                    [0, line_nb],
+                )
+            )
             ax.text(xevent, line_nb + 0.5, event.label, rotation=45)
 
         ax.yaxis.set_visible(False)

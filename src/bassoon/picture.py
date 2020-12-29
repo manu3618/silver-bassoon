@@ -57,6 +57,25 @@ class PictureGetter:
                 self.logger.info(msg)
             await im.get_image()
 
+    def to_html(self):
+        ret = ["<div>"]
+
+        for pic_nb, pic in enumerate(self.pictures):
+            if pic_nb % 4 == 3:
+                # TODO: insert linebreak
+                pass
+            ret.append(
+                "<div style='height: 200px; display: inline-block; "
+                "float: left; position: relative; margin: 4px;'>"
+            )
+            ret.append('<a href="{}">'.format(pic.url))
+            ret.append("<img src=\"{}\" style='height: 100%;'/>".format(pic.filename))
+            ret.append("</a>")
+            ret.append("</div>")
+
+        ret.append("</div>")
+        return "\n".join(ret)
+
 
 async def dl_file(url, filename, nb_try=5, wait_time=10, logger=None):
     """Write file from url to filename.

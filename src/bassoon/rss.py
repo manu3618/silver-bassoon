@@ -24,8 +24,7 @@ class Feed:
             raise RuntimeWarning(resp.reason)
 
     def analyze(self):
-        """analyze feed
-        """
+        """analyze feed"""
         soup = BeautifulSoup(self.content, features="html.parser")
         self.title = soup.title.text
 
@@ -38,8 +37,7 @@ class Feed:
         return self._articles()
 
     def _articles(self):
-        """Return articles from feed content.
-        """
+        """Return articles from feed content."""
         soup = BeautifulSoup(self.content, features="html.parser")
         for article in soup.find_all("entry"):
             yield {elt.name: elt.content for elt in article.children}
