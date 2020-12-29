@@ -12,8 +12,7 @@ from string import punctuation
 import dateutil.parser
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
-
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 import tinydb
 
 from .rss import Feed
